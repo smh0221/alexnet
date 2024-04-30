@@ -5,6 +5,7 @@ import warnings
 from data import *
 from model import *
 
+
 def evaluate_accuracy(data_iter, net, device=None):
     if device is None and isinstance(net, torch.nn.Module):
         # 如果没指定device就使用net的device
@@ -30,7 +31,7 @@ def train(net, train_loader, test_loader, optimizer, device, epoch_num):
         train_l_sum, train_acc_sum, n, batch_idx, start = 0.0, 0.0, 0, 0, time.time()
         # train_loader可以用迭代器的方式访问，具体的返回取决于DataSet的定义，返回的数据量应该是一个batch的
         for X, y in train_loader:
-            # print("batch_idx: ", batch_idx)
+            print("batch_idx: ", batch_idx)
             # 数据部署到设备上
             X = X.to(device)
             y = y.to(device)
@@ -61,17 +62,14 @@ def get_args_parser(add_help=True):
     import argparse
     parser = argparse.ArgumentParser(description="PyTorch AlexNet Training", add_help=add_help)
     parser.add_argument("--data-path", default="/home/shangminghao/dataset/fashion_mnist", type=str, help="dataset path")
-    parser.add_argument("-d", "--device", default="cpu", type=str, help="cpu or cuda (defaule: cpu)")
-    parser.add_argument("-b", "--batch-size", default=64, type=int, help="batch size for training (default: 8)")
+    parser.add_argument("-d", "--device", default="cuda", type=str, help="cpu or cuda (defaule: cuda)")
+    parser.add_argument("-b", "--batch-size", default=128, type=int, help="batch size for training (default: 128)")
     parser.add_argument("-e", "--epochs", default=5, type=int, metavar="N", help="epochs for training (default: 5)")
     parser.add_argument(
-        "-j", "--workers", default=0, type=int, metavar="N", help="number of data loading workers (default: 0)"
+        "-j", "--workers", default=4, type=int, metavar="N", help="number of data loading workers (default: 4)"
     )
     parser.add_argument("-o", "--opt", default="adam", type=str, help="optimizer (defaule: adam)")
-    parser.add_argument("-l", "--lr", default=0.1, type=float, help="initial learning rate (default: 0.1)")
-    parser.add_argument(
-        "--train-resize-size", default=224, type=int, help="the resized size used for training (default: 224)"
-    )
+    parser.add_argument("-l", "--lr", default=0.001, type=float, help="initial learning rate (default: 0.001)")
     parser.add_argument("--output-path", default="/home/shangminghao/workspace/alexnet/train_output", type=str, help="train output path")
     return parser
 
@@ -80,7 +78,7 @@ def main(args):
     if args.output_path and not os.path.exists(args.output_path):
         os.mkdir(args.output_path)
     device = torch.device(args.device) # 初始化设备类型
-    train_loader, test_loader = create_data_loader(args.data_path, args.batch_size, args.train_resize_size, args.workers) # 初始化数据集
+    train_loader, test_loader = create_data_loader(args.data_path, args.batch_size, args.workers) # 初始化数据集
     net = AlexNet() # 初始化模型
     if args.opt == "sgd":
         optimizer = torch.optim.SGD(net.parameters(), lr=args.lr) # 初始化优化器

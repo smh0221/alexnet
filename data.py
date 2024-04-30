@@ -4,10 +4,9 @@ import torchvision
 __all__ = ['create_data_loader']
 
 # 加载数据集
-def create_data_loader(root, batch_size, resize, workers):
+def create_data_loader(root, batch_size, workers):
     trans = []
-    if resize:
-        trans.append(torchvision.transforms.Resize(size=resize)) # 添加Resize对象到列表中
+    trans.append(torchvision.transforms.Resize(size=224)) # 添加Resize对象到列表中
     trans.append(torchvision.transforms.ToTensor()) # 添加ToTensor对象到列表中用于将PIL图像转为numpy矩阵
     transform = torchvision.transforms.Compose(trans) # 用列表初始化Compose对象
     mnist_train = torchvision.datasets.FashionMNIST(root=root, train=True, download=True, transform=transform) # 返回一个数据集实例，用于训练
